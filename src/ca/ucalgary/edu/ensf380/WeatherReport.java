@@ -85,7 +85,99 @@ public class WeatherReport {
 
         return weatherReport;
     }
+<<<<<<< HEAD
 
     public static void main(String[] args) {
         }
     }
+=======
+    
+    public static void main(String[] args) {
+        if (args.length < 1) {
+            System.out.println("Please provide a city code as a command-line argument.");
+            return;
+        }
+
+        int cityCode;
+        try {
+            cityCode = Integer.parseInt(args[0]);
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid city code. Please provide a numeric value.");
+            return;
+        }
+
+        List<String> weatherReport = getWeatherReport(cityCode);
+
+        for (String line : weatherReport) {
+            System.out.println(line);
+        }
+    }
+
+
+   
+}
+
+
+
+//import java.io.BufferedReader;
+//import java.io.BufferedWriter;
+//import java.io.FileWriter;
+//import java.io.InputStreamReader;
+//import java.net.URL;
+//import java.util.regex.Matcher;
+//import java.util.regex.Pattern;
+//
+//public class WeatherReport {
+//    private String location;
+//
+//    public void fetchWeather(String cityCode) throws Exception {
+//        // Construct the URL for the specific city
+//        String url = "https://openweathermap.org/city/" + cityCode;
+//        URL weatherUrl = new URL(url);
+//
+//        // Read the HTML content
+//        BufferedReader reader = new BufferedReader(new InputStreamReader(weatherUrl.openStream()));
+//        StringBuilder htmlContent = new StringBuilder();
+//        String line;
+//        while ((line = reader.readLine()) != null) {
+//            htmlContent.append(line);
+//        }
+//        reader.close();
+//        System.out.println(htmlContent.toString());
+//
+//        // Write the HTML content to a text file
+//        try (BufferedWriter writer = new BufferedWriter(new FileWriter("weather.html"))) {
+//            writer.write(htmlContent.toString());
+//        }
+//
+//     // Define regular expression to extract location
+//        Pattern locationPattern = Pattern.compile("<h2 data-v-3e6e9f12=\"\" style=\"margin-top: 0px;\">(.*?)<\\/h2>");
+//
+//        // Match and extract location
+//        Matcher locationMatcher = locationPattern.matcher(htmlContent.toString());
+//        if (locationMatcher.find()) {
+//            location = locationMatcher.group(1); // Adjust group number as needed
+//        }
+//
+//
+//        System.out.println("Location: " + location);
+//    }
+//
+//    public static void main(String[] args) {
+//        WeatherReport weatherReport = new WeatherReport();
+//
+//        
+//        String cityCode = "5913490";
+//
+//        try {
+//            weatherReport.fetchWeather(cityCode);
+//            System.out.println("Weather data fetched and written to weather.html");
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            System.out.println("An error occurred while fetching the weather data.");
+//        }
+//    }
+//}
+
+
+>>>>>>> dev
