@@ -6,14 +6,14 @@ import java.sql.*;
  * The Database class provides methods to connect to a MySQL database and perform
  * CRUD operations on the advertisements table.
  */
-public class DatabaseConnection {
+public class Database {
 	private Connection dbConnect;
 	private ResultSet results;
 	
 	/**
      * Default constructor.
      */
-	public DatabaseConnection() {
+	public Database() {
 		
 	}
 	
@@ -132,15 +132,12 @@ public class DatabaseConnection {
      * @param args Command-line arguments (not used).
      */
 	public static void main(String[] args) {
-		DatabaseConnection advertisements = new DatabaseConnection();
+		Database advertisements = new Database();
 		advertisements.createConnection();
 		
 		// Inserting sample advertisements
-	    advertisements.insertAds("Food Promotion", "Mexican Food", "Location: 123 Road NW", "JPEG", "C:\\Users\\tonmo\\Desktop\\Ads\\mexfood", Date.valueOf("2023-08-01"), Date.valueOf("2023-08-31"), 10);
-	    advertisements.insertAds("Colgate", "Toothpaste", "STRENGTHENS WEAKEND ENAMELS", "JPEG", "C:\\Users\\tonmo\\Desktop\\Ads\\colgate", Date.valueOf("2023-08-01"), Date.valueOf("2023-09-30"), 10);
-	    advertisements.insertAds("Merchant Warehouse", "Agent & ISO PROGRAM", "Join the program today. Call 800-743-8047 to learn more", "JPEG", "C:\\Users\\tonmo\\Desktop\\Ads\\hire", Date.valueOf("2023-08-01"), Date.valueOf("2023-09-30"), 10);
-	    advertisements.insertAds("Careers", "We are Hiring", "Social Media Manager Digital Marketing Specialist", "JPEG", "C:\\Users\\tonmo\\Desktop\\Ads\\agent", Date.valueOf("2023-08-01"), Date.valueOf("2023-09-1"), 10);
-
+	    advertisements.insertAds("Sample Title 1", "Sample Subtitle 1", "Sample Text 1", "PDF", "path/to/file1.pdf", Date.valueOf("2023-08-01"), Date.valueOf("2023-08-31"), 30);
+	    advertisements.insertAds("Sample Title 2", "Sample Subtitle 2", "Sample Text 2", "JPEG", "path/to/image2.jpg", Date.valueOf("2023-09-01"), Date.valueOf("2023-09-30"), 15);
 
 	    // Selecting and displaying advertisements
 	    advertisements.selectAds();
@@ -152,6 +149,32 @@ public class DatabaseConnection {
 
 
 
-
+//package ca.ucalgary.edu.ensf380;
+//
+//import java.sql.Connection;
+//import java.sql.DriverManager;
+//import java.sql.ResultSet;
+//import java.sql.SQLException;
+//import java.sql.Statement;
+//
+//public class DatabaseConnection {
+//  public static void main(String[] args) {
+//      String url = "jdbc:mysql://localhost:3306/subwayscreen"; // schema name
+//      String user = "root"; // MySQL username
+//      String password = "Password"; // MySQL password
+//      String query = "SELECT * FROM advertisements";
+//
+//      try {
+//          Connection connection = DriverManager.getConnection(url, user, password);
+//          //System.out.println("Connected to the database!");
+//          Statement statement = connection.createStatement();
+//          ResultSet resultSet = statement.executeQuery(query);
+//          // more code here
+//      } catch (SQLException e) {
+//          e.printStackTrace();
+//          System.out.println("Failed to connect to the database.");
+//      }
+//  }
+//}
 
 
