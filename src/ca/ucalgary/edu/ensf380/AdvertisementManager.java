@@ -31,4 +31,9 @@ public class AdvertisementManager {
             System.out.println("-----------------------------");
         }
     }
+    
+    public List<Advertisement> getAdvertisements() {
+        return advertisements;
+    }
+
 }

@@ -1,6 +1,8 @@
 package ca.ucalgary.edu.ensf380;
 
+import java.io.FileInputStream;
 import java.sql.*;
+import java.util.Properties;
 //import java.util.ArrayList;
 //import java.util.List;
 
@@ -23,14 +25,24 @@ public class DatabaseConnection {
      * Establishes a connection to the MySQL database.
      */
 	public void createConnection() {
-		try {
-			dbConnect = DriverManager.getConnection("jdbc:mysql://localhost:3306/subwayscreen","root","Password");
-			System.out.println("Connected to the database!");
-		} catch (SQLException e) {
-			e.printStackTrace();
-			System.out.println("Failed to connect to the database.");
-		}
+	    try {
+	        Properties props = new Properties();
+	        FileInputStream in = new FileInputStream(".//data//db.properties");
+	        props.load(in);
+	        in.close();
+
+	        String url = props.getProperty("url");
+	        String username = props.getProperty("username");
+	        String password = props.getProperty("password");
+
+	        dbConnect = DriverManager.getConnection(url, username, password);
+	        System.out.println("Connected to the database!");
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        System.out.println("Failed to connect to the database.");
+	    }
 	}
+
 	/**
      * Retrieves and prints all advertisements from the database.
      */
@@ -135,7 +147,7 @@ public class DatabaseConnection {
 	        if (results != null) { // Check if results is not null before closing
 	            results.close();
 	        }
-	        if (dbConnect != null) { // It's also good to check dbConnect before closing
+	        if (dbConnect != null) { // check dbConnect before closing
 	            dbConnect.close();
 	        }
 	    } catch (SQLException e) {
@@ -151,22 +163,30 @@ public class DatabaseConnection {
 	public static void main(String[] args) {
 		DatabaseConnection dbConnection = new DatabaseConnection();
 		dbConnection.createConnection();
-		
-		// Inserting sample advertisements
-		dbConnection.insertAds("Food Promotion", "Mexican Food", "Location: 123 Road NW", "JPEG",
-	    		"C:\\Users\\tonmo\\Desktop\\Ads\\mexfood", Date.valueOf("2023-08-01"), Date.valueOf("2023-08-31"), 10);
-		dbConnection.insertAds("Colgate", "Toothpaste", "STRENGTHENS WEAKEND ENAMELS", "JPEG", 
-	    		"C:\\Users\\tonmo\\Desktop\\Ads\\colgate", Date.valueOf("2023-08-01"), Date.valueOf("2023-09-30"), 10);
-		dbConnection.insertAds("Merchant Warehouse", "Agent & ISO PROGRAM", "Join the program today. Call 800-743-8047"
-	    		+ " to learn more", "JPEG", "C:\\Users\\tonmo\\Desktop\\Ads\\hire", Date.valueOf("2023-08-01"), Date.valueOf("2023-09-30"), 10);
-		dbConnection.insertAds("Careers", "We are Hiring", "Social Media Manager Digital Marketing Specialist", 
-	    		"JPEG", "C:\\Users\\tonmo\\Desktop\\Ads\\agent", Date.valueOf("2023-08-01"), Date.valueOf("2023-09-1"), 10);
-	    
-	    AdvertisementManager manager = new AdvertisementManager();
-	    manager.loadAdvertisementsFromDatabase(dbConnection);
-	    manager.printAdvertisements();
 
-	    dbConnection.close();
+		// Inserting sample advertisements
+//		dbConnection.insertAds("Food Promotion", "Mexican Food", "Location: 123 Road NW", "JPEG",
+//		        ".//media//mexfood.jpg", Date.valueOf("2023-08-01"), Date.valueOf("2023-08-31"), 10);
+//		dbConnection.insertAds("Colgate", "Toothpaste", "STRENGTHENS WEAKEND ENAMELS", "JPEG", 
+//		        ".//media//colgate.jpeg", Date.valueOf("2023-08-01"), Date.valueOf("2023-09-30"), 10);
+//		dbConnection.insertAds("Merchant Warehouse", "Agent & ISO PROGRAM", "Join the program today. Call 800-743-8047"
+//		        + " to learn more", "JPEG", ".//media//hire.jpg", Date.valueOf("2023-08-01"), Date.valueOf("2023-09-30"), 10);
+//		dbConnection.insertAds("Careers", "We are Hiring", "Social Media Manager Digital Marketing Specialist", 
+//		        "JPEG", ".//media//agent.jpg", Date.valueOf("2023-08-01"), Date.valueOf("2023-09-1"), 10);
+
+		AdvertisementManager manager = new AdvertisementManager();
+		manager.loadAdvertisementsFromDatabase(dbConnection);
+
+		// Create and display the GUI 
+		new AdvertisementDisplay(manager.getAdvertisements());
+
+		// Get the advertisements and print their media paths
+//		List<Advertisement> ads = manager.getAdvertisements(); // Assuming you have a getter for the advertisements list
+//		for (Advertisement ad : ads) {
+//		    System.out.println(ad.getMediaPath());
+//		}
+		dbConnection.close();
+
 		
 	}
 }
