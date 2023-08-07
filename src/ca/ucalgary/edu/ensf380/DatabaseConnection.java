@@ -1,6 +1,8 @@
 package ca.ucalgary.edu.ensf380;
 
 import java.sql.*;
+//import java.util.ArrayList;
+//import java.util.List;
 
 /**
  * The Database class provides methods to connect to a MySQL database and perform
@@ -32,28 +34,43 @@ public class DatabaseConnection {
 	/**
      * Retrieves and prints all advertisements from the database.
      */
-	public void selectAds() {
+	public ResultSet selectAds() {
+	    ResultSet results = null;
 	    try {
 	        String query = "SELECT * FROM advertisements";
 	        Statement statement = dbConnect.createStatement();
 	        results = statement.executeQuery(query);
-	        while (results.next()) {
-	            System.out.println("ID: " + results.getInt("id"));
-	            System.out.println("Title: " + results.getString("title"));
-	            System.out.println("Subtitle: " + results.getString("subtitle"));
-	            System.out.println("Text: " + results.getString("text"));
-	            System.out.println("Media Type: " + results.getString("media_type"));
-	            System.out.println("Media Path: " + results.getString("media_path"));
-	            System.out.println("Start Date: " + results.getDate("start_date"));
-	            System.out.println("End Date: " + results.getDate("end_date"));
-	            System.out.println("Duration: " + results.getInt("duration"));
-	            System.out.println("-----------------------------");
-	        }
 	    } catch (SQLException e) {
 	        e.printStackTrace();
 	        System.out.println("Failed to select advertisements.");
 	    }
+	    return results;
 	}
+
+
+//	    try {
+//	        String query = "SELECT * FROM advertisements";
+//	        Statement statement = dbConnect.createStatement();
+//	        results = statement.executeQuery(query);
+//	        while (results.next()) {
+//	            System.out.println("ID: " + results.getInt("id"));
+//	            System.out.println("Title: " + results.getString("title"));
+//	            System.out.println("Subtitle: " + results.getString("subtitle"));
+//	            System.out.println("Text: " + results.getString("text"));
+//	            System.out.println("Media Type: " + results.getString("media_type"));
+//	            System.out.println("Media Path: " + results.getString("media_path"));
+//	            System.out.println("Start Date: " + results.getDate("start_date"));
+//	            System.out.println("End Date: " + results.getDate("end_date"));
+//	            System.out.println("Duration: " + results.getInt("duration"));
+//	            System.out.println("-----------------------------");
+//	        }
+//	    } catch (SQLException e) {
+//	        e.printStackTrace();
+//	        System.out.println("Failed to select advertisements.");
+//	    }
+//	    
+//	    
+//	}
 
 	 /**
      * Inserts a new advertisement into the database.
@@ -132,20 +149,24 @@ public class DatabaseConnection {
      * @param args Command-line arguments (not used).
      */
 	public static void main(String[] args) {
-		DatabaseConnection advertisements = new DatabaseConnection();
-		advertisements.createConnection();
+		DatabaseConnection dbConnection = new DatabaseConnection();
+		dbConnection.createConnection();
 		
 		// Inserting sample advertisements
-	    advertisements.insertAds("Food Promotion", "Mexican Food", "Location: 123 Road NW", "JPEG", "C:\\Users\\tonmo\\Desktop\\Ads\\mexfood", Date.valueOf("2023-08-01"), Date.valueOf("2023-08-31"), 10);
-	    advertisements.insertAds("Colgate", "Toothpaste", "STRENGTHENS WEAKEND ENAMELS", "JPEG", "C:\\Users\\tonmo\\Desktop\\Ads\\colgate", Date.valueOf("2023-08-01"), Date.valueOf("2023-09-30"), 10);
-	    advertisements.insertAds("Merchant Warehouse", "Agent & ISO PROGRAM", "Join the program today. Call 800-743-8047 to learn more", "JPEG", "C:\\Users\\tonmo\\Desktop\\Ads\\hire", Date.valueOf("2023-08-01"), Date.valueOf("2023-09-30"), 10);
-	    advertisements.insertAds("Careers", "We are Hiring", "Social Media Manager Digital Marketing Specialist", "JPEG", "C:\\Users\\tonmo\\Desktop\\Ads\\agent", Date.valueOf("2023-08-01"), Date.valueOf("2023-09-1"), 10);
+		dbConnection.insertAds("Food Promotion", "Mexican Food", "Location: 123 Road NW", "JPEG",
+	    		"C:\\Users\\tonmo\\Desktop\\Ads\\mexfood", Date.valueOf("2023-08-01"), Date.valueOf("2023-08-31"), 10);
+		dbConnection.insertAds("Colgate", "Toothpaste", "STRENGTHENS WEAKEND ENAMELS", "JPEG", 
+	    		"C:\\Users\\tonmo\\Desktop\\Ads\\colgate", Date.valueOf("2023-08-01"), Date.valueOf("2023-09-30"), 10);
+		dbConnection.insertAds("Merchant Warehouse", "Agent & ISO PROGRAM", "Join the program today. Call 800-743-8047"
+	    		+ " to learn more", "JPEG", "C:\\Users\\tonmo\\Desktop\\Ads\\hire", Date.valueOf("2023-08-01"), Date.valueOf("2023-09-30"), 10);
+		dbConnection.insertAds("Careers", "We are Hiring", "Social Media Manager Digital Marketing Specialist", 
+	    		"JPEG", "C:\\Users\\tonmo\\Desktop\\Ads\\agent", Date.valueOf("2023-08-01"), Date.valueOf("2023-09-1"), 10);
+	    
+	    AdvertisementManager manager = new AdvertisementManager();
+	    manager.loadAdvertisementsFromDatabase(dbConnection);
+	    manager.printAdvertisements();
 
-
-	    // Selecting and displaying advertisements
-	    advertisements.selectAds();
-
-	    advertisements.close();
+	    dbConnection.close();
 		
 	}
 }
