@@ -42,7 +42,6 @@ import java.util.Comparator;
 
 import java.util.Scanner;
 
-
 /**
  * @author Mahdi Ansari
  *
@@ -50,143 +49,137 @@ import java.util.Scanner;
 public class MyApp3 extends JFrame implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	private JTextArea outputArea;
-    private JButton startButton;
-    private JButton stopButton;
-    private Process process;
-    private ExecutorService executor;
+	private JButton startButton;
+	private JButton stopButton;
+	private Process process;
+	private ExecutorService executor;
 
-    public MyApp3() {
-        setTitle("Subway Screen 3");
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
-        addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                stopProcess();
-                dispose();
-            }
-        });
+	public MyApp3() {
+		setTitle("Subway Screen 3");
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+				stopProcess();
+				dispose();
+			}
+		});
 
-        outputArea = new JTextArea();
-        outputArea.setEditable(false);
-        JScrollPane scrollPane = new JScrollPane(outputArea);
-        scrollPane.setPreferredSize(new Dimension(400, 300));
-        add(scrollPane, BorderLayout.CENTER);
+		outputArea = new JTextArea();
+		outputArea.setEditable(false);
+		JScrollPane scrollPane = new JScrollPane(outputArea);
+		scrollPane.setPreferredSize(new Dimension(400, 300));
+		add(scrollPane, BorderLayout.CENTER);
 
-        JPanel buttonPanel = new JPanel();
-        startButton = new JButton("Start");
-        startButton.addActionListener(this);
-        startButton.setPreferredSize(new Dimension(100, 38));
-        buttonPanel.add(startButton);
+		JPanel buttonPanel = new JPanel();
+		startButton = new JButton("Start");
+		startButton.addActionListener(this);
+		startButton.setPreferredSize(new Dimension(100, 38));
+		buttonPanel.add(startButton);
 
-        stopButton = new JButton("Stop");
-        stopButton.addActionListener(this);
-        stopButton.setEnabled(false);
-        stopButton.setPreferredSize(new Dimension(100, 38));
-        buttonPanel.add(stopButton);
+		stopButton = new JButton("Stop");
+		stopButton.addActionListener(this);
+		stopButton.setEnabled(false);
+		stopButton.setPreferredSize(new Dimension(100, 38));
+		buttonPanel.add(stopButton);
 
-        add(buttonPanel, BorderLayout.SOUTH);
+		add(buttonPanel, BorderLayout.SOUTH);
 
-        pack();
-        setLocationRelativeTo(null);
-        setVisible(true);
+		pack();
+		setLocationRelativeTo(null);
+		setVisible(true);
 
-        executor = Executors.newFixedThreadPool(2);
-    }
+		executor = Executors.newFixedThreadPool(2);
+	}
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == startButton) {
-            startProcess();
-        } else if (e.getSource() == stopButton) {
-            stopProcess();
-        }
-    }
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() == startButton) {
+			startProcess();
+		} else if (e.getSource() == stopButton) {
+			stopProcess();
+		}
+	}
 
-    private void startProcess() {
-        if (process == null) {
-            try {
-                ProcessBuilder builder = new ProcessBuilder("java", "-jar", "./exe/SubwaySimulator.jar", "--in", "./data/subway.csv", "--out", "./out");
-                builder.redirectErrorStream(true);
-                process = builder.start();
-				
-                executor.execute(() -> {
-                    try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-						
-                        String line;
+	private void startProcess() {
+		if (process == null) {
+			try {
+				ProcessBuilder builder = new ProcessBuilder("java", "-jar", "./exe/SubwaySimulator.jar", "--in",
+						"./data/subway.csv", "--out", "./out");
+				builder.redirectErrorStream(true);
+				process = builder.start();
+
+				executor.execute(() -> {
+					try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+
+						String line;
 						int i = 0;
 						int currentTrain = 3; // 1-12
-                        while ((line = reader.readLine()) != null) {
-							
-						if(3 == i) {
-							
-							TrainArray.Train[] trains = TrainArray.parseCsvFile();
+						while ((line = reader.readLine()) != null) {
 
-							System.out.println(trains[currentTrain].toString());
-							
-							ArrayList<Integer> xCoordinates = new ArrayList<>();
-							ArrayList<Integer> yCoordinates = new ArrayList<>();
-							for(TrainArray.Train train : trains) {
-								xCoordinates.add(train.getTrainXCord());
-								yCoordinates.add(train.getTrainYCord());
+							if (3 == i) {
+
+								TrainArray.Train[] trains = TrainArray.parseCsvFile();
+
+								System.out.println(trains[currentTrain].toString());
+
+								ArrayList<Integer> xCoordinates = new ArrayList<>();
+								ArrayList<Integer> yCoordinates = new ArrayList<>();
+								for (TrainArray.Train train : trains) {
+									xCoordinates.add(train.getTrainXCord());
+									yCoordinates.add(train.getTrainYCord());
+								}
+
+								TrainMapCreator.createImage(xCoordinates, yCoordinates, currentTrain);
+
+								String query = "Calgary";
+								NewsFetcher.Article article = NewsFetcher.fetchNews(query);
+								if (article != null) {
+									System.out.println(article.getTitle() + article.getSummary());
+								} else {
+									System.out.println("No articles found.");
+								}
+
+								i = 0;
 							}
-								
-							TrainMapCreator.createImage(xCoordinates, yCoordinates, currentTrain);
-							
-							
-							String query = "Calgary";
-							NewsFetcher.Article article = NewsFetcher.fetchNews(query);
-							if (article != null) {
-								System.out.println(article.getTitle() + article.getSummary());
-							} else {
-								System.out.println("No articles found.");
-							}								
-							
-							
+							i++;
 
-							i = 0;
 						}
-						i++;
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				});
 
-								
-						}
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                });
+				executor.execute(() -> {
+					try {
+						process.waitFor();
+						process = null;
+						SwingUtilities.invokeLater(() -> {
+							stopButton.setEnabled(false);
+							startButton.setEnabled(true);
+						});
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				});
 
-                executor.execute(() -> {
-                    try {
-                        process.waitFor();
-                        process = null;
-                        SwingUtilities.invokeLater(() -> {
-                            stopButton.setEnabled(false);
-                            startButton.setEnabled(true);
-                        });
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                });
+				stopButton.setEnabled(true);
+				startButton.setEnabled(false);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
-                stopButton.setEnabled(true);
-                startButton.setEnabled(false);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+	private void stopProcess() {
+		if (process != null) {
+			process.destroy();
+			process = null;
+			stopButton.setEnabled(false);
+			startButton.setEnabled(true);
+		}
+	}
 
-    private void stopProcess() {
-        if (process != null) {
-            process.destroy();
-            process = null;
-            stopButton.setEnabled(false);
-            startButton.setEnabled(true);
-        }
-    }
-	
-
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(MyApp3::new);
-    }
+	public static void main(String[] args) {
+		SwingUtilities.invokeLater(MyApp3::new);
+	}
 }
-

@@ -10,109 +10,102 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class WeatherReport {
-    private static final String DEFAULT_API_KEY = "5fdefdda2457466fb45b3023b72408d5";
+	private static final String DEFAULT_API_KEY = "5fdefdda2457466fb45b3023b72408d5";
 
-    private static String fetchWeatherData(int cityCode, String apiKey) throws Exception {
+	private static String fetchWeatherData(int cityCode, String apiKey) throws Exception {
 
-        String apiUrl = "http://api.openweathermap.org/data/2.5/weather?id=" + cityCode + "&appid=" + apiKey;
+		String apiUrl = "http://api.openweathermap.org/data/2.5/weather?id=" + cityCode + "&appid=" + apiKey;
 
+		URL url = new URL(apiUrl);
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
-        URL url = new URL(apiUrl);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		conn.setRequestMethod("GET");
 
+		int responseCode = conn.getResponseCode();
 
-        conn.setRequestMethod("GET");
+		if (responseCode == HttpURLConnection.HTTP_OK) {
 
+			BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			String inputLine;
+			StringBuilder response = new StringBuilder();
 
-        int responseCode = conn.getResponseCode();
+			while ((inputLine = in.readLine()) != null) {
+				response.append(inputLine);
+			}
+			in.close();
 
-        if (responseCode == HttpURLConnection.HTTP_OK) {
+			return response.toString();
+		} else {
+			throw new Exception("Error: Unable to fetch data. Response Code: " + responseCode);
+		}
+	}
 
-            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            String inputLine;
-            StringBuilder response = new StringBuilder();
+	public static List<String> getWeatherReport(int cityCode) {
+		return getWeatherReport(cityCode, DEFAULT_API_KEY);
+	}
 
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
+	public static List<String> getWeatherReport(int cityCode, String apiKey) {
+		List<String> weatherReport = new ArrayList<>();
 
-            return response.toString();
-        } else {
-            throw new Exception("Error: Unable to fetch data. Response Code: " + responseCode);
-        }
-    }
+		if (apiKey == null || apiKey.isEmpty()) {
+			apiKey = DEFAULT_API_KEY;
+		}
 
-    public static List<String> getWeatherReport(int cityCode) {
-        return getWeatherReport(cityCode, DEFAULT_API_KEY);
-    }
+		try {
+			String response = fetchWeatherData(cityCode, apiKey);
 
-    public static List<String> getWeatherReport(int cityCode, String apiKey) {
-        List<String> weatherReport = new ArrayList<>();
+			Pattern temperaturePattern = Pattern.compile("\"temp\":(\\d+\\.\\d+)");
+			Pattern conditionsPattern = Pattern.compile("\"description\":\"([^\"]+)\"");
+			Pattern cityNamePattern = Pattern.compile("\"name\":\"([^\"]+)\"");
+			Pattern countryPattern = Pattern.compile("\"country\":\"([^\"]+)\"");
 
-        if (apiKey == null || apiKey.isEmpty()) {
-            apiKey = DEFAULT_API_KEY;
-        }
+			Matcher temperatureMatcher = temperaturePattern.matcher(response);
+			Matcher conditionsMatcher = conditionsPattern.matcher(response);
+			Matcher cityNameMatcher = cityNamePattern.matcher(response);
+			Matcher countryMatcher = countryPattern.matcher(response);
 
-        try {
-            String response = fetchWeatherData(cityCode, apiKey);
+			if (temperatureMatcher.find() && conditionsMatcher.find() && cityNameMatcher.find()
+					&& countryMatcher.find()) {
+				double temperature = Double.parseDouble(temperatureMatcher.group(1)) - 273.15;
+				String conditions = conditionsMatcher.group(1);
+				String cityName = cityNameMatcher.group(1);
+				String country = countryMatcher.group(1);
 
-            Pattern temperaturePattern = Pattern.compile("\"temp\":(\\d+\\.\\d+)");
-            Pattern conditionsPattern = Pattern.compile("\"description\":\"([^\"]+)\"");
-            Pattern cityNamePattern = Pattern.compile("\"name\":\"([^\"]+)\"");
-            Pattern countryPattern = Pattern.compile("\"country\":\"([^\"]+)\"");
+				weatherReport.add("City: " + cityName + ", " + country);
+				weatherReport.add("Temperature: " + String.format("%.2f", temperature) + " Celsius");
+				weatherReport.add("Conditions: " + conditions);
+			} else {
+				weatherReport.add("Error: Unable to extract data from JSON response.");
+			}
+		} catch (Exception e) {
+			weatherReport.add("Error: " + e.getMessage());
+		}
 
-            Matcher temperatureMatcher = temperaturePattern.matcher(response);
-            Matcher conditionsMatcher = conditionsPattern.matcher(response);
-            Matcher cityNameMatcher = cityNamePattern.matcher(response);
-            Matcher countryMatcher = countryPattern.matcher(response);
+		return weatherReport;
+	}
 
-            if (temperatureMatcher.find() && conditionsMatcher.find() && cityNameMatcher.find() && countryMatcher.find()) {
-                double temperature = Double.parseDouble(temperatureMatcher.group(1)) - 273.15;
-                String conditions = conditionsMatcher.group(1);
-                String cityName = cityNameMatcher.group(1);
-                String country = countryMatcher.group(1);
+	public static void main(String[] args) {
+		if (args.length < 1) {
+			System.out.println("Please provide a city code as a command-line argument.");
+			return;
+		}
 
-                weatherReport.add("City: " + cityName + ", " + country);
-                weatherReport.add("Temperature: " + String.format("%.2f", temperature) + " Celsius");
-                weatherReport.add("Conditions: " + conditions);
-            } else {
-                weatherReport.add("Error: Unable to extract data from JSON response.");
-            }
-        } catch (Exception e) {
-            weatherReport.add("Error: " + e.getMessage());
-        }
+		int cityCode;
+		try {
+			cityCode = Integer.parseInt(args[0]);
+		} catch (NumberFormatException e) {
+			System.out.println("Invalid city code. Please provide a numeric value.");
+			return;
+		}
 
-        return weatherReport;
-    }
+		List<String> weatherReport = getWeatherReport(cityCode);
 
-    
-    public static void main(String[] args) {
-        if (args.length < 1) {
-            System.out.println("Please provide a city code as a command-line argument.");
-            return;
-        }
+		for (String line : weatherReport) {
+			System.out.println(line);
+		}
+	}
 
-        int cityCode;
-        try {
-            cityCode = Integer.parseInt(args[0]);
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid city code. Please provide a numeric value.");
-            return;
-        }
-
-        List<String> weatherReport = getWeatherReport(cityCode);
-
-        for (String line : weatherReport) {
-            System.out.println(line);
-        }
-    }
-
-
-   
 }
-
-
 
 //import java.io.BufferedReader;
 //import java.io.BufferedWriter;
@@ -173,4 +166,3 @@ public class WeatherReport {
 //        }
 //    }
 //}
-

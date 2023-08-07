@@ -7,58 +7,57 @@ import java.util.Properties;
 //import java.util.List;
 
 /**
- * The Database class provides methods to connect to a MySQL database and perform
- * CRUD operations on the advertisements table.
+ * The Database class provides methods to connect to a MySQL database and
+ * perform CRUD operations on the advertisements table.
  */
 public class DatabaseConnection {
 	private Connection dbConnect;
 	private ResultSet results;
-	
+
 	/**
-     * Default constructor.
-     */
+	 * Default constructor.
+	 */
 	public DatabaseConnection() {
-		
-	}
-	
-	 /**
-     * Establishes a connection to the MySQL database.
-     */
-	public void createConnection() {
-	    try {
-	        Properties props = new Properties();
-	        FileInputStream in = new FileInputStream(".//data//db.properties");
-	        props.load(in);
-	        in.close();
 
-	        String url = props.getProperty("url");
-	        String username = props.getProperty("username");
-	        String password = props.getProperty("password");
-
-	        dbConnect = DriverManager.getConnection(url, username, password);
-	        System.out.println("Connected to the database!");
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        System.out.println("Failed to connect to the database.");
-	    }
 	}
 
 	/**
-     * Retrieves and prints all advertisements from the database.
-     */
-	public ResultSet selectAds() {
-	    ResultSet results = null;
-	    try {
-	        String query = "SELECT * FROM advertisements";
-	        Statement statement = dbConnect.createStatement();
-	        results = statement.executeQuery(query);
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	        System.out.println("Failed to select advertisements.");
-	    }
-	    return results;
+	 * Establishes a connection to the MySQL database.
+	 */
+	public void createConnection() {
+		try {
+			Properties props = new Properties();
+			FileInputStream in = new FileInputStream(".//data//db.properties");
+			props.load(in);
+			in.close();
+
+			String url = props.getProperty("url");
+			String username = props.getProperty("username");
+			String password = props.getProperty("password");
+
+			dbConnect = DriverManager.getConnection(url, username, password);
+			System.out.println("Connected to the database!");
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Failed to connect to the database.");
+		}
 	}
 
+	/**
+	 * Retrieves and prints all advertisements from the database.
+	 */
+	public ResultSet selectAds() {
+		ResultSet results = null;
+		try {
+			String query = "SELECT * FROM advertisements";
+			Statement statement = dbConnect.createStatement();
+			results = statement.executeQuery(query);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("Failed to select advertisements.");
+		}
+		return results;
+	}
 
 //	    try {
 //	        String query = "SELECT * FROM advertisements";
@@ -84,82 +83,82 @@ public class DatabaseConnection {
 //	    
 //	}
 
-	 /**
-     * Inserts a new advertisement into the database.
-     *
-     * @param title      The title of the advertisement.
-     * @param subtitle   The subtitle of the advertisement.
-     * @param text       The text content of the advertisement.
-     * @param mediaType  The media type of the advertisement.
-     * @param mediaPath  The path to the media file.
-     * @param startDate  The start date of the advertisement.
-     * @param endDate    The end date of the advertisement.
-     * @param duration   The duration of the advertisement.
-     */
-	public void insertAds(String title, String subtitle, String text, String mediaType, String mediaPath, Date startDate, Date endDate, int duration) {
-	    try {
-	        // Check for existing record with the same values
-	        String checkQuery = "SELECT * FROM advertisements WHERE title = ? AND subtitle = ? AND text = ? AND media_type = ? AND media_path = ? AND start_date = ? AND end_date = ? AND duration = ?";
-	        PreparedStatement checkStatement = dbConnect.prepareStatement(checkQuery);
-	        checkStatement.setString(1, title);
-	        checkStatement.setString(2, subtitle);
-	        checkStatement.setString(3, text);
-	        checkStatement.setString(4, mediaType);
-	        checkStatement.setString(5, mediaPath);
-	        checkStatement.setDate(6, startDate);
-	        checkStatement.setDate(7, endDate);
-	        checkStatement.setInt(8, duration);
-	        ResultSet checkResults = checkStatement.executeQuery();
-	        if (checkResults.next()) {
-	            System.out.println("Advertisement with the same values already exists. Skipping insertion.");
-	            return; // Exit the method if a matching record is found
-	        }
+	/**
+	 * Inserts a new advertisement into the database.
+	 *
+	 * @param title     The title of the advertisement.
+	 * @param subtitle  The subtitle of the advertisement.
+	 * @param text      The text content of the advertisement.
+	 * @param mediaType The media type of the advertisement.
+	 * @param mediaPath The path to the media file.
+	 * @param startDate The start date of the advertisement.
+	 * @param endDate   The end date of the advertisement.
+	 * @param duration  The duration of the advertisement.
+	 */
+	public void insertAds(String title, String subtitle, String text, String mediaType, String mediaPath,
+			Date startDate, Date endDate, int duration) {
+		try {
+			// Check for existing record with the same values
+			String checkQuery = "SELECT * FROM advertisements WHERE title = ? AND subtitle = ? AND text = ? AND media_type = ? AND media_path = ? AND start_date = ? AND end_date = ? AND duration = ?";
+			PreparedStatement checkStatement = dbConnect.prepareStatement(checkQuery);
+			checkStatement.setString(1, title);
+			checkStatement.setString(2, subtitle);
+			checkStatement.setString(3, text);
+			checkStatement.setString(4, mediaType);
+			checkStatement.setString(5, mediaPath);
+			checkStatement.setDate(6, startDate);
+			checkStatement.setDate(7, endDate);
+			checkStatement.setInt(8, duration);
+			ResultSet checkResults = checkStatement.executeQuery();
+			if (checkResults.next()) {
+				System.out.println("Advertisement with the same values already exists. Skipping insertion.");
+				return; // Exit the method if a matching record is found
+			}
 
-	        // Insert new record
-	        String query = "INSERT INTO advertisements (title, subtitle, text, media_type, media_path, start_date, end_date, duration) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-	        PreparedStatement preparedStatement = dbConnect.prepareStatement(query);
-	        preparedStatement.setString(1, title);
-	        preparedStatement.setString(2, subtitle);
-	        preparedStatement.setString(3, text);
-	        preparedStatement.setString(4, mediaType);
-	        preparedStatement.setString(5, mediaPath);
-	        preparedStatement.setDate(6, startDate);
-	        preparedStatement.setDate(7, endDate);
-	        preparedStatement.setInt(8, duration);
-	        preparedStatement.executeUpdate();
-	        System.out.println("Advertisement inserted successfully!");
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	        System.out.println("Failed to insert advertisement.");
-	    }
+			// Insert new record
+			String query = "INSERT INTO advertisements (title, subtitle, text, media_type, media_path, start_date, end_date, duration) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+			PreparedStatement preparedStatement = dbConnect.prepareStatement(query);
+			preparedStatement.setString(1, title);
+			preparedStatement.setString(2, subtitle);
+			preparedStatement.setString(3, text);
+			preparedStatement.setString(4, mediaType);
+			preparedStatement.setString(5, mediaPath);
+			preparedStatement.setDate(6, startDate);
+			preparedStatement.setDate(7, endDate);
+			preparedStatement.setInt(8, duration);
+			preparedStatement.executeUpdate();
+			System.out.println("Advertisement inserted successfully!");
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("Failed to insert advertisement.");
+		}
 	}
-
 
 	public void deleteAds() {
-		//not needed then delete
-	}
-	
-	/**
-     * Closes the ResultSet and Connection objects.
-     */
-	public void close() {
-	    try {
-	        if (results != null) { // Check if results is not null before closing
-	            results.close();
-	        }
-	        if (dbConnect != null) { // check dbConnect before closing
-	            dbConnect.close();
-	        }
-	    } catch (SQLException e) {
-	        e.printStackTrace();
-	    }
+		// not needed then delete
 	}
 
 	/**
-     * Main method to demonstrate the usage of the Database class.
-     *
-     * @param args Command-line arguments (not used).
-     */
+	 * Closes the ResultSet and Connection objects.
+	 */
+	public void close() {
+		try {
+			if (results != null) { // Check if results is not null before closing
+				results.close();
+			}
+			if (dbConnect != null) { // check dbConnect before closing
+				dbConnect.close();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Main method to demonstrate the usage of the Database class.
+	 *
+	 * @param args Command-line arguments (not used).
+	 */
 	public static void main(String[] args) {
 		DatabaseConnection dbConnection = new DatabaseConnection();
 		dbConnection.createConnection();
@@ -177,7 +176,7 @@ public class DatabaseConnection {
 		AdvertisementManager manager = new AdvertisementManager();
 		manager.loadAdvertisementsFromDatabase(dbConnection);
 
-		// Create and display the GUI 
+		// Create and display the GUI
 		new AdvertisementDisplay(manager.getAdvertisements());
 
 		// Get the advertisements and print their media paths
@@ -187,12 +186,5 @@ public class DatabaseConnection {
 //		}
 		dbConnection.close();
 
-		
 	}
 }
-
-
-
-
-
-
