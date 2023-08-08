@@ -18,6 +18,7 @@ public class WeatherReportDisplay extends JPanel {
 
 		// Text area to display weather report
 		weatherReportArea = new JTextArea();
+		weatherReportArea.setBackground(Color.YELLOW);
 		weatherReportArea.setEditable(false);
 		JScrollPane scrollPane = new JScrollPane(weatherReportArea);
 

@@ -49,6 +49,7 @@ public class MyApp3 extends JFrame implements ActionListener {
     private static int currentTrain;
     
     private JPanel newsPanel;
+    private JLabel textLabel = new JLabel("");
     
 	private AdvertisementDisplay advertisementDisplay;
     private WeatherReportDisplay WeatherReportDisplay;
@@ -194,7 +195,7 @@ public class MyApp3 extends JFrame implements ActionListener {
 									xCoordinates.add(train.getTrainXCord());
 									yCoordinates.add(train.getTrainYCord());
 								}
-						        JLabel textLabel = new JLabel(trains[currentTrain].getPrevStationName() +
+						        textLabel.setText(trains[currentTrain].getPrevStationName() +
 						        		" -->  |" + trains[currentTrain].getCurrentStationName() + "|  ---> " +
 						        		trains[currentTrain].getNextStationName());
 						        textLabel.setFont(new Font("Arial", Font.BOLD, 20));
