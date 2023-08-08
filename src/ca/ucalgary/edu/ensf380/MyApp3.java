@@ -54,6 +54,8 @@ public class MyApp3 extends JFrame implements ActionListener {
     private WeatherReportDisplay WeatherReportDisplay;
     
     private static List<Advertisement> advertisements;
+    
+    private TrainArray.Train[] trains;
 
     public MyApp3() {
         setTitle("Subway Screen");
@@ -85,14 +87,13 @@ public class MyApp3 extends JFrame implements ActionListener {
         // Create Weather Report GUI
         WeatherReportDisplay = new WeatherReportDisplay(5913490);
         WeatherReportDisplay.setVisible(false); // Initially hidden
-        
-        
 
         
         add(advertisementDisplay, BorderLayout.WEST);
         add(WeatherReportDisplay, BorderLayout.EAST);
 
         add(buttonPanel, BorderLayout.NORTH);
+        
         
         NewsFetcher.Article article = NewsFetcher.fetchNews(query);
         if (article != null) {
@@ -110,6 +111,7 @@ public class MyApp3 extends JFrame implements ActionListener {
 
         executor = Executors.newFixedThreadPool(2);
     }
+    
     /**
      * startNewsTicker displays a news ticker on the gui based on the input string
      * 
@@ -119,12 +121,17 @@ public class MyApp3 extends JFrame implements ActionListener {
     	 // Formatting
     	
         newsPanel = new JPanel(new BorderLayout());
-        newsPanel.setPreferredSize(new Dimension(getWidth(), 30));
+        newsPanel.setPreferredSize(new Dimension(getWidth(), 80));
+        newsPanel.setBackground(Color.GREEN);
         JLabel newsLabel = new JLabel(newsText, SwingConstants.LEFT);
         newsLabel.setFont(new Font("Arial", Font.BOLD, 18));
         newsPanel.add(newsLabel, BorderLayout.CENTER);
         add(newsPanel, BorderLayout.SOUTH);
         newsPanel.setVisible(false);
+        
+        if(trains != null) {
+
+        }
 
         
         // Only scroll text if article was found
@@ -180,13 +187,18 @@ public class MyApp3 extends JFrame implements ActionListener {
 							i++;
 							if (4 == i) {
 
-								TrainArray.Train[] trains = TrainArray.parseCsvFile();
+								trains = TrainArray.parseCsvFile();
 								ArrayList<Integer> xCoordinates = new ArrayList<>();
 								ArrayList<Integer> yCoordinates = new ArrayList<>();
 								for (TrainArray.Train train : trains) {
 									xCoordinates.add(train.getTrainXCord());
 									yCoordinates.add(train.getTrainYCord());
 								}
+						        JLabel textLabel = new JLabel(trains[currentTrain].getPrevStationName() +
+						        		" -->  |" + trains[currentTrain].getCurrentStationName() + "|  ---> " +
+						        		trains[currentTrain].getNextStationName());
+						        textLabel.setFont(new Font("Arial", Font.BOLD, 20));
+						        newsPanel.add(textLabel, BorderLayout.NORTH);
 								TrainMapCreator.createImage(xCoordinates, yCoordinates, currentTrain);
 								i = 0;
 							}

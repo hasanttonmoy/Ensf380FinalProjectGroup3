@@ -89,6 +89,16 @@ public class TrainArray {
 		public int getTrainYCord() {
 			return (int) Float.parseFloat(currentStationYCord);
 		}
+		public String getCurrentStationName() {
+			return currentStationName;
+		}
+		public String getPrevStationName() {
+			return prevStationName;
+		}
+		
+		public String getNextStationName() {
+			return nextStationName;
+		}
 
 		@Override
 		public String toString() { // Used for debugging
