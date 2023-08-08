@@ -3,6 +3,7 @@ package ca.ucalgary.edu.ensf380;
 import java.io.FileInputStream;
 import java.sql.*;
 import java.util.Properties;
+
 //import java.util.ArrayList;
 //import java.util.List;
 
@@ -154,16 +155,16 @@ public class DatabaseConnection {
 		}
 	}
 
-	/**
-	 * Main method to demonstrate the usage of the Database class.
-	 *
-	 * @param args Command-line arguments (not used).
-	 */
-	public static void main(String[] args) {
-		DatabaseConnection dbConnection = new DatabaseConnection();
-		dbConnection.createConnection();
-
-		// Inserting sample advertisements
+//	/**
+//	 * Main method to demonstrate the usage of the Database class.
+//	 *
+//	 * @param args Command-line arguments (not used).
+//	 */
+//	public static void main(String[] args) {
+//		DatabaseConnection dbConnection = new DatabaseConnection();
+//		dbConnection.createConnection();
+//
+//		// Inserting sample advertisements
 //		dbConnection.insertAds("Food Promotion", "Mexican Food", "Location: 123 Road NW", "JPEG",
 //		        ".//media//mexfood.jpg", Date.valueOf("2023-08-01"), Date.valueOf("2023-08-31"), 10);
 //		dbConnection.insertAds("Colgate", "Toothpaste", "STRENGTHENS WEAKEND ENAMELS", "JPEG", 
@@ -172,19 +173,19 @@ public class DatabaseConnection {
 //		        + " to learn more", "JPEG", ".//media//hire.jpg", Date.valueOf("2023-08-01"), Date.valueOf("2023-09-30"), 10);
 //		dbConnection.insertAds("Careers", "We are Hiring", "Social Media Manager Digital Marketing Specialist", 
 //		        "JPEG", ".//media//agent.jpg", Date.valueOf("2023-08-01"), Date.valueOf("2023-09-1"), 10);
-
-		AdvertisementManager manager = new AdvertisementManager();
-		manager.loadAdvertisementsFromDatabase(dbConnection);
-
-		// Create and display the GUI
-		new AdvertisementDisplay(manager.getAdvertisements());
-
-		// Get the advertisements and print their media paths
+//
+//		AdvertisementManager manager = new AdvertisementManager();
+//		manager.loadAdvertisementsFromDatabase(dbConnection);
+//
+//		// Create and display the GUI
+//		new AdvertisementDisplay(manager.getAdvertisements());
+//
+//		// Get the advertisements and print their media paths
 //		List<Advertisement> ads = manager.getAdvertisements(); // Assuming you have a getter for the advertisements list
 //		for (Advertisement ad : ads) {
 //		    System.out.println(ad.getMediaPath());
 //		}
-		dbConnection.close();
-
-	}
+//		dbConnection.close();
+//
+//	}
 }

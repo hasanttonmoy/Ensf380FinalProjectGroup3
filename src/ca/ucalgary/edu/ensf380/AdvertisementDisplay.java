@@ -6,7 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
-public class AdvertisementDisplay extends JFrame {
+public class AdvertisementDisplay extends JPanel {
 	/**
 	 * 
 	 */
@@ -40,10 +40,10 @@ public class AdvertisementDisplay extends JFrame {
 		add(panel);
 
 		// Set frame properties
-		setTitle("Advertisements");
-		setSize(400, 300);
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		setVisible(true);
+//		setTitle("Advertisements");
+//		setSize(400, 300);
+//		setDefaultCloseOperation(EXIT_ON_CLOSE);
+//		setVisible(true);
 
 		// Set timer to rotate advertisements
 		Timer timer = new Timer(10000, new ActionListener() {
@@ -69,8 +69,8 @@ public class AdvertisementDisplay extends JFrame {
 		ImageIcon icon = new ImageIcon(ad.getMediaPath());
 
 		// Scale the image to fit the label
-		int imageWidth = 200; // Desired width
-		int imageHeight = 150; // Desired height
+		int imageWidth = 550; // Desired width
+		int imageHeight = 300; // Desired height
 		Image image = icon.getImage().getScaledInstance(imageWidth, imageHeight, Image.SCALE_SMOOTH);
 
 		// Set the scaled image to the label
