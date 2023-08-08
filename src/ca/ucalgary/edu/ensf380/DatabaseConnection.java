@@ -11,7 +11,7 @@ import java.util.Properties;
  * The Database class provides methods to connect to a MySQL database and
  * perform CRUD operations on the advertisements table.
  */
-public class DatabaseConnection {
+public class DatabaseConnection implements IDatabaseConnection {
 	private Connection dbConnect;
 	private ResultSet results;
 
@@ -25,6 +25,7 @@ public class DatabaseConnection {
 	/**
 	 * Establishes a connection to the MySQL database.
 	 */
+	@Override
 	public void createConnection() {
 		try {
 			Properties props = new Properties();
@@ -47,6 +48,7 @@ public class DatabaseConnection {
 	/**
 	 * Retrieves and prints all advertisements from the database.
 	 */
+	@Override
 	public ResultSet selectAds() {
 		ResultSet results = null;
 		try {
@@ -96,6 +98,7 @@ public class DatabaseConnection {
 	 * @param endDate   The end date of the advertisement.
 	 * @param duration  The duration of the advertisement.
 	 */
+	@Override
 	public void insertAds(String title, String subtitle, String text, String mediaType, String mediaPath,
 			Date startDate, Date endDate, int duration) {
 		try {
@@ -135,6 +138,7 @@ public class DatabaseConnection {
 		}
 	}
 
+	@Override
 	public void deleteAds() {
 		// not needed then delete
 	}
@@ -142,6 +146,7 @@ public class DatabaseConnection {
 	/**
 	 * Closes the ResultSet and Connection objects.
 	 */
+	@Override
 	public void close() {
 		try {
 			if (results != null) { // Check if results is not null before closing
