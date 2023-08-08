@@ -92,9 +92,9 @@ public class MyApp3 extends JFrame implements ActionListener {
         add(advertisementDisplay, BorderLayout.WEST);
         add(WeatherReportDisplay, BorderLayout.EAST);
 
-        add(buttonPanel, BorderLayout.SOUTH);
+        add(buttonPanel, BorderLayout.NORTH);
         
-        NewsFetcher.Article article = NewsFetcher.fetchNews(query, "5-8tIA1Lcsf0C4UoBn18EL-dEpRpc8GXogoACHGpnkA");
+        NewsFetcher.Article article = NewsFetcher.fetchNews(query);
         if (article != null) {
             currentNewsText = article.getTitle() + " " + article.getSummary();
             startNewsTicker(currentNewsText);
@@ -123,7 +123,7 @@ public class MyApp3 extends JFrame implements ActionListener {
         JLabel newsLabel = new JLabel(newsText, SwingConstants.LEFT);
         newsLabel.setFont(new Font("Arial", Font.BOLD, 18));
         newsPanel.add(newsLabel, BorderLayout.CENTER);
-        add(newsPanel, BorderLayout.NORTH);
+        add(newsPanel, BorderLayout.SOUTH);
         newsPanel.setVisible(false);
 
         

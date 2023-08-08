@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.sql.*;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.sql.*;
+
 public class AdvertisementManager {
 	private List<Advertisement> advertisements;
 
@@ -19,7 +23,9 @@ public class AdvertisementManager {
 				String subtitle = results.getString("subtitle");
 				String text = results.getString("text");
 				String mediaPath = results.getString("media_path");
-				advertisements.add(new Advertisement(title, subtitle, text, mediaPath));
+				Date startDate = results.getDate("start_date");
+				Date endDate = results.getDate("end_date");
+				advertisements.add(new Advertisement(title, subtitle, text, mediaPath, startDate, endDate));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -36,5 +42,4 @@ public class AdvertisementManager {
 	public List<Advertisement> getAdvertisements() {
 		return advertisements;
 	}
-
 }

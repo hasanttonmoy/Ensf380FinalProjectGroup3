@@ -42,7 +42,7 @@ public class NewsFetcher {
 	}
 
 	// Default API key
-	private static final String DEFAULT_API_KEY = "GfYGggGCiK2WmNC-5HqQs9lSml0uveo5izmCL0ATtW8";
+	private static final String DEFAULT_API_KEY = "lw5kQ01DtbCTP-1yJLbtUUc3ETj4pKqIfzulMBSHRuo";
 
 	/**
 	 * Fetches news articles from the API based on the query using an API key

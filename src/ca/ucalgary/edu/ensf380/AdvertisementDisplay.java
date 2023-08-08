@@ -4,12 +4,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 public class AdvertisementDisplay extends JPanel {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private List<Advertisement> advertisements;
 	private int currentAdIndex = 0;
@@ -18,6 +16,8 @@ public class AdvertisementDisplay extends JPanel {
 	private JLabel subtitleLabel;
 	private JLabel textLabel;
 	private JLabel mediaLabel;
+	private JLabel startDateLabel;
+	private JLabel endDateLabel;
 
 	public AdvertisementDisplay(List<Advertisement> advertisements) {
 		this.advertisements = advertisements;
@@ -27,6 +27,8 @@ public class AdvertisementDisplay extends JPanel {
 		subtitleLabel = new JLabel();
 		textLabel = new JLabel();
 		mediaLabel = new JLabel();
+		startDateLabel = new JLabel();
+		endDateLabel = new JLabel();
 
 		// Create panel and add labels
 		JPanel panel = new JPanel();
@@ -35,15 +37,11 @@ public class AdvertisementDisplay extends JPanel {
 		panel.add(subtitleLabel);
 		panel.add(textLabel);
 		panel.add(mediaLabel);
+		panel.add(startDateLabel);
+		panel.add(endDateLabel);
 
 		// Add panel to frame
 		add(panel);
-
-		// Set frame properties
-//		setTitle("Advertisements");
-//		setSize(400, 300);
-//		setDefaultCloseOperation(EXIT_ON_CLOSE);
-//		setVisible(true);
 
 		// Set timer to rotate advertisements
 		Timer timer = new Timer(10000, new ActionListener() {
@@ -60,12 +58,15 @@ public class AdvertisementDisplay extends JPanel {
 
 	private void displayNextAdvertisement(int showMap) {
 		Advertisement ad = advertisements.get(currentAdIndex);
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
 		titleLabel.setText("Title: " + ad.getTitle());
 		subtitleLabel.setText("Subtitle: " + ad.getSubtitle());
 		textLabel.setText("Text: " + ad.getText());
-		
+		startDateLabel.setText("Start Date: " + sdf.format(ad.getStartDate()));
+		endDateLabel.setText("End Date: " + sdf.format(ad.getEndDate()));
+
 		String mediapath;
-		// Load image from media path
 		// Load image from media path
 		if (showMap % 2 == 0) {
 			mediapath = ad.getMediaPath();
@@ -75,17 +76,14 @@ public class AdvertisementDisplay extends JPanel {
 		ImageIcon icon = new ImageIcon(mediapath);
 
 		// Scale the image to fit the label
-		int imageWidth = 550; // Desired width
+		int imageWidth = 500; // Desired width
 		int imageHeight = 300; // Desired height
 		Image image = icon.getImage().getScaledInstance(imageWidth, imageHeight, Image.SCALE_SMOOTH);
 
 		// Set the scaled image to the label
-
 		mediaLabel.setIcon(new ImageIcon(image));
-	
 
 		// Increment index for next advertisement
 		currentAdIndex = (currentAdIndex + 1) % advertisements.size();
 	}
-
 }
