@@ -115,6 +115,7 @@ public class TrainArray {
 		String currentDirectory = System.getProperty("user.dir");
 		String outputPath = currentDirectory + File.separator + "out";
 		File newestfile = getLastModified(outputPath);
+		if (newestfile != null) {
 		String lastpath = outputPath + "\\" + newestfile.getName();
 		try (BufferedReader br = new BufferedReader(new FileReader(lastpath))) {
 			String line;
@@ -189,6 +190,8 @@ public class TrainArray {
 			e.printStackTrace();
 		}
 		return trains.toArray(new Train[0]);
+		}
+		return new Train[0];
 	}
 
 	/**
