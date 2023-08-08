@@ -45,6 +45,7 @@ public class MyApp3 extends JFrame implements ActionListener {
     
     private String currentNewsText;
     private static String query;
+    private static int currentTrain;
 
     public MyApp3() {
         setTitle("Subway Screen");
@@ -146,7 +147,7 @@ public class MyApp3 extends JFrame implements ActionListener {
 					try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
 						String line;
 						int i = 0;
-						int currentTrain = 3; // 1-12
+
 						while ((line = reader.readLine()) != null) {
 							i++;
 							if (4 == i) {
@@ -198,10 +199,21 @@ public class MyApp3 extends JFrame implements ActionListener {
 	}
 
 	public static void main(String[] args) {
-		if (args.length > 0) { 
-			query = args[0];
+		
+		if (args.length > 0) {
+			try {
+				currentTrain = Integer.parseInt(args[0]);
+			} catch (NumberFormatException e) {
+				System.err.println("Invalid arg for current train number. Using default value of 1.");
+				currentTrain = 1;
+			}
+		}
+		
+		
+		if (args.length > 1) { 
+			query = args[1];
 		} else {
-			query = "Calgary";
+			query = "Calgary"; // Default
 		}
 
 
