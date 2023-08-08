@@ -33,63 +33,97 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import java.io.File;
-import java.util.Arrays;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Comparator;
 
-import java.util.Scanner;
-
-/**
- * @author Mahdi Ansari
- *
- */
 public class MyApp3 extends JFrame implements ActionListener {
-	private static final long serialVersionUID = 1L;
-	private JTextArea outputArea;
-	private JButton startButton;
-	private JButton stopButton;
-	private Process process;
-	private ExecutorService executor;
+    private static final long serialVersionUID = 1L;
+    private static final String NO_ARTICLE = "No articles found.";
+    private JButton startButton;
+    private JButton stopButton;
+    private Process process;
+    private ExecutorService executor;
+    
+    private String currentNewsText;
+    String query = "Calgary";
 
-	public MyApp3() {
-		setTitle("Subway Screen 3");
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent e) {
-				stopProcess();
-				dispose();
-			}
-		});
+    public MyApp3() {
+        setTitle("Subway Screen");
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                stopProcess();
+                dispose();
+            }
+        });
 
-		outputArea = new JTextArea();
-		outputArea.setEditable(false);
-		JScrollPane scrollPane = new JScrollPane(outputArea);
-		scrollPane.setPreferredSize(new Dimension(400, 300));
-		add(scrollPane, BorderLayout.CENTER);
+        JPanel buttonPanel = new JPanel();
+        startButton = new JButton("Start");
+        startButton.addActionListener(this);
+        startButton.setPreferredSize(new Dimension(200, 38));
+        buttonPanel.add(startButton);
 
-		JPanel buttonPanel = new JPanel();
-		startButton = new JButton("Start");
-		startButton.addActionListener(this);
-		startButton.setPreferredSize(new Dimension(100, 38));
-		buttonPanel.add(startButton);
+        stopButton = new JButton("Stop");
+        stopButton.addActionListener(this);
+        stopButton.setEnabled(false);
+        stopButton.setPreferredSize(new Dimension(200, 38));
+        buttonPanel.add(stopButton);
 
-		stopButton = new JButton("Stop");
-		stopButton.addActionListener(this);
-		stopButton.setEnabled(false);
-		stopButton.setPreferredSize(new Dimension(100, 38));
-		buttonPanel.add(stopButton);
+        add(buttonPanel, BorderLayout.SOUTH);
+        
+        
+        NewsFetcher.Article article = NewsFetcher.fetchNews(query, "5-8tIA1Lcsf0C4UoBn18EL-dEpRpc8GXogoACHGpnkA");
+        if (article != null) {
+            currentNewsText = article.getTitle() + " " + article.getSummary();
+            startNewsTicker(currentNewsText);
+        } else {
+            currentNewsText = NO_ARTICLE;
+            startNewsTicker(currentNewsText);
+        }
+		
+        pack();
+        setLocationRelativeTo(null);
+        setVisible(true);
 
-		add(buttonPanel, BorderLayout.SOUTH);
+        executor = Executors.newFixedThreadPool(2);
+    }
+    /**
+     * startNewsTicker displays a news ticker on the gui based on the input string
+     * 
+     * @param newsText
+     */
+    public void startNewsTicker(String newsText) {
+        JPanel newsPanel = new JPanel(new BorderLayout()); // Create a panel to hold the news ticker
+        newsPanel.setPreferredSize(new Dimension(getWidth(), 30)); // Set the preferred height
 
-		pack();
-		setLocationRelativeTo(null);
-		setVisible(true);
+        JLabel newsLabel = new JLabel(newsText, SwingConstants.LEFT); // Set the text alignment to left
+        newsLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        newsPanel.add(newsLabel, BorderLayout.CENTER);
 
-		executor = Executors.newFixedThreadPool(2);
-	}
+        add(newsPanel, BorderLayout.NORTH);
+
+        if (!newsText.equals(NO_ARTICLE)) {
+            Timer timer = new Timer(100, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                	// Simulates scrolling by moving last char of string to the back repeatedly
+                    String labelText = newsLabel.getText();
+                    char firstChar = labelText.charAt(0);
+                    labelText = labelText.substring(1) + firstChar;
+                    newsLabel.setText(labelText);
+
+                    if (labelText.equals(currentNewsText)) {
+                        // Scrolling has reached the end so fetch a new article
+                        NewsFetcher.Article newArticle = NewsFetcher.fetchNews(query, "5-8tIA1Lcsf0C4UoBn18EL-dEpRpc8GXogoACHGpnkA");
+                        if (newArticle != null) {
+                            currentNewsText = newArticle.getTitle() + " " + newArticle.getSummary();
+                            newsLabel.setText(currentNewsText);
+                        }
+                    }
+                }
+            });
+            timer.start();
+        }
+    }
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -115,8 +149,8 @@ public class MyApp3 extends JFrame implements ActionListener {
 						int i = 0;
 						int currentTrain = 3; // 1-12
 						while ((line = reader.readLine()) != null) {
-
-							if (3 == i) {
+							i++;
+							if (4 == i) {
 
 								TrainArray.Train[] trains = TrainArray.parseCsvFile();
 
@@ -131,17 +165,11 @@ public class MyApp3 extends JFrame implements ActionListener {
 
 								TrainMapCreator.createImage(xCoordinates, yCoordinates, currentTrain);
 
-								String query = "Calgary";
-								NewsFetcher.Article article = NewsFetcher.fetchNews(query);
-								if (article != null) {
-									System.out.println(article.getTitle() + article.getSummary());
-								} else {
-									System.out.println("No articles found.");
-								}
+
 
 								i = 0;
 							}
-							i++;
+							
 
 						}
 					} catch (IOException e) {
