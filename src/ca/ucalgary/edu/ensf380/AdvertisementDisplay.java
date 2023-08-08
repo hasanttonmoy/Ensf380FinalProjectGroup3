@@ -49,24 +49,30 @@ public class AdvertisementDisplay extends JPanel {
 		Timer timer = new Timer(10000, new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				displayNextAdvertisement();
+				displayNextAdvertisement(currentAdIndex);
 			}
 		});
 		timer.start();
 
 		// Display the first advertisement
-		displayNextAdvertisement();
+		displayNextAdvertisement(currentAdIndex);
 	}
 
-	private void displayNextAdvertisement() {
+	private void displayNextAdvertisement(int showMap) {
 		Advertisement ad = advertisements.get(currentAdIndex);
 		titleLabel.setText("Title: " + ad.getTitle());
 		subtitleLabel.setText("Subtitle: " + ad.getSubtitle());
 		textLabel.setText("Text: " + ad.getText());
-
+		
+		String mediapath;
 		// Load image from media path
 		// Load image from media path
-		ImageIcon icon = new ImageIcon(ad.getMediaPath());
+		if (showMap % 2 == 0) {
+			mediapath = ad.getMediaPath();
+		} else {
+			mediapath = ("./data/trainmap.png");
+		}
+		ImageIcon icon = new ImageIcon(mediapath);
 
 		// Scale the image to fit the label
 		int imageWidth = 550; // Desired width
@@ -74,7 +80,9 @@ public class AdvertisementDisplay extends JPanel {
 		Image image = icon.getImage().getScaledInstance(imageWidth, imageHeight, Image.SCALE_SMOOTH);
 
 		// Set the scaled image to the label
+
 		mediaLabel.setIcon(new ImageIcon(image));
+	
 
 		// Increment index for next advertisement
 		currentAdIndex = (currentAdIndex + 1) % advertisements.size();
