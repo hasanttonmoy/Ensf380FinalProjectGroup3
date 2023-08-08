@@ -35,7 +35,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * MyApp3 is the main GUI class that is used to display our GUI
+ */
 public class MyApp3 extends JFrame implements ActionListener {
     private static final long serialVersionUID = 1L;
     private static final String NO_ARTICLE = "No articles found.";
@@ -71,13 +73,14 @@ public class MyApp3 extends JFrame implements ActionListener {
                 dispose();
             }
         });
-
+        // Start Button
         JPanel buttonPanel = new JPanel();
         startButton = new JButton("Start");
         startButton.addActionListener(this);
         startButton.setPreferredSize(new Dimension(200, 38));
         buttonPanel.add(startButton);
-
+        
+        // Stop Button
         stopButton = new JButton("Stop");
         stopButton.addActionListener(this);
         stopButton.setEnabled(false);
@@ -97,7 +100,7 @@ public class MyApp3 extends JFrame implements ActionListener {
 
         add(buttonPanel, BorderLayout.NORTH);
         
-
+        // Uses news api either with user inputted api or a default one
         if("" != userAPI) {  
 	        NewsFetcher.Article article = NewsFetcher.fetchNews(query, userAPI);
 	        if (article != null) {
@@ -118,8 +121,6 @@ public class MyApp3 extends JFrame implements ActionListener {
 	        }
         }
         
-
-		
         setLocationRelativeTo(null);
         setVisible(true);
 
@@ -142,12 +143,7 @@ public class MyApp3 extends JFrame implements ActionListener {
         newsPanel.add(newsLabel, BorderLayout.CENTER);
         add(newsPanel, BorderLayout.SOUTH);
         newsPanel.setVisible(false);
-        
-        if(trains != null) {
 
-        }
-
-        
         // Only scroll text if article was found
         if (!newsText.equals(NO_ARTICLE)) {
             Timer timer = new Timer(100, new ActionListener() {
@@ -200,20 +196,23 @@ public class MyApp3 extends JFrame implements ActionListener {
 						while ((line = reader.readLine()) != null) {
 							i++;
 							if (4 == i) {
-
+								//Update train values
 								trains = TrainArray.parseCsvFile();
+								//Update map
 								ArrayList<Integer> xCoordinates = new ArrayList<>();
 								ArrayList<Integer> yCoordinates = new ArrayList<>();
+								TrainMapCreator.createImage(xCoordinates, yCoordinates, currentTrain);
 								for (TrainArray.Train train : trains) {
 									xCoordinates.add(train.getTrainXCord());
 									yCoordinates.add(train.getTrainYCord());
 								}
+								//Update stations that are being shown
 						        textLabel.setText(trains[currentTrain].getPrevStationName() +
 						        		" -->  |" + trains[currentTrain].getCurrentStationName() + "|  ---> " +
 						        		trains[currentTrain].getNextStationName());
 						        textLabel.setFont(new Font("Arial", Font.BOLD, 20));
 						        newsPanel.add(textLabel, BorderLayout.NORTH);
-								TrainMapCreator.createImage(xCoordinates, yCoordinates, currentTrain);
+								
 								i = 0;
 							}
 						}
