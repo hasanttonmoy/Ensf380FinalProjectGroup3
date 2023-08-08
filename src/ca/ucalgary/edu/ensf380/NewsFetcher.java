@@ -103,7 +103,7 @@ public class NewsFetcher {
 					String articleData = articles[randomNum]; // Random article
 
 					// Extract the title string and summary string
-					String title = extractValue(articleData, "title").replaceAll("\\s+", " ").replaceAll("\\\\n", ""); // Get
+					String title = "		" + extractValue(articleData, "title").replaceAll("\\s+", " ").replaceAll("\\\\n", ""); // Get
 																														// rid
 																														// of
 																														// extra

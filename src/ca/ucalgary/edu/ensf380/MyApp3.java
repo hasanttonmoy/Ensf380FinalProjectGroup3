@@ -44,7 +44,7 @@ public class MyApp3 extends JFrame implements ActionListener {
     private ExecutorService executor;
     
     private String currentNewsText;
-    String query = "Calgary";
+    private static String query;
 
     public MyApp3() {
         setTitle("Subway Screen");
@@ -92,15 +92,15 @@ public class MyApp3 extends JFrame implements ActionListener {
      * @param newsText
      */
     public void startNewsTicker(String newsText) {
-        JPanel newsPanel = new JPanel(new BorderLayout()); // Create a panel to hold the news ticker
-        newsPanel.setPreferredSize(new Dimension(getWidth(), 30)); // Set the preferred height
-
-        JLabel newsLabel = new JLabel(newsText, SwingConstants.LEFT); // Set the text alignment to left
+    	 // Formatting
+        JPanel newsPanel = new JPanel(new BorderLayout());
+        newsPanel.setPreferredSize(new Dimension(getWidth(), 30));
+        JLabel newsLabel = new JLabel(newsText, SwingConstants.LEFT);
         newsLabel.setFont(new Font("Arial", Font.BOLD, 18));
         newsPanel.add(newsLabel, BorderLayout.CENTER);
-
         add(newsPanel, BorderLayout.NORTH);
-
+        
+        // Only scroll text if article was found
         if (!newsText.equals(NO_ARTICLE)) {
             Timer timer = new Timer(100, new ActionListener() {
                 @Override
@@ -144,7 +144,6 @@ public class MyApp3 extends JFrame implements ActionListener {
 
 				executor.execute(() -> {
 					try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-
 						String line;
 						int i = 0;
 						int currentTrain = 3; // 1-12
@@ -153,24 +152,15 @@ public class MyApp3 extends JFrame implements ActionListener {
 							if (4 == i) {
 
 								TrainArray.Train[] trains = TrainArray.parseCsvFile();
-
-								System.out.println(trains[currentTrain].toString());
-
 								ArrayList<Integer> xCoordinates = new ArrayList<>();
 								ArrayList<Integer> yCoordinates = new ArrayList<>();
 								for (TrainArray.Train train : trains) {
 									xCoordinates.add(train.getTrainXCord());
 									yCoordinates.add(train.getTrainYCord());
 								}
-
 								TrainMapCreator.createImage(xCoordinates, yCoordinates, currentTrain);
-
-
-
 								i = 0;
 							}
-							
-
 						}
 					} catch (IOException e) {
 						e.printStackTrace();
@@ -208,6 +198,13 @@ public class MyApp3 extends JFrame implements ActionListener {
 	}
 
 	public static void main(String[] args) {
+		if (args.length > 0) { 
+			query = args[0];
+		} else {
+			query = "Calgary";
+		}
+
+
 		SwingUtilities.invokeLater(MyApp3::new);
 	}
 }
