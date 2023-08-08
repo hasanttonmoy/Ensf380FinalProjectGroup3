@@ -39,6 +39,8 @@ public class AdvertisementDisplay extends JPanel {
 		panel.add(mediaLabel);
 		panel.add(startDateLabel);
 		panel.add(endDateLabel);
+		
+		panel.setBackground(Color.PINK);
 
 		// Add panel to frame
 		add(panel);

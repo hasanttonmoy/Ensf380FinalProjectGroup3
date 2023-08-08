@@ -47,6 +47,8 @@ public class MyApp3 extends JFrame implements ActionListener {
     private String currentNewsText;
     private static String query;
     private static int currentTrain;
+    private static int cityCode;
+    private static String userAPI = "";
     
     private JPanel newsPanel;
     private JLabel textLabel = new JLabel("");
@@ -86,7 +88,7 @@ public class MyApp3 extends JFrame implements ActionListener {
         advertisementDisplay.setVisible(false); // Initially hidden
 
         // Create Weather Report GUI
-        WeatherReportDisplay = new WeatherReportDisplay(5913490);
+        WeatherReportDisplay = new WeatherReportDisplay(cityCode);
         WeatherReportDisplay.setVisible(false); // Initially hidden
 
         
@@ -95,14 +97,25 @@ public class MyApp3 extends JFrame implements ActionListener {
 
         add(buttonPanel, BorderLayout.NORTH);
         
-        
-        NewsFetcher.Article article = NewsFetcher.fetchNews(query);
-        if (article != null) {
-            currentNewsText = article.getTitle() + " " + article.getSummary();
-            startNewsTicker(currentNewsText);
+
+        if("" != userAPI) {  
+	        NewsFetcher.Article article = NewsFetcher.fetchNews(query, userAPI);
+	        if (article != null) {
+	            currentNewsText = article.getTitle() + " " + article.getSummary();
+	            startNewsTicker(currentNewsText);
+	        } else {
+	            currentNewsText = NO_ARTICLE;
+	            startNewsTicker(currentNewsText);
+	        }
         } else {
-            currentNewsText = NO_ARTICLE;
-            startNewsTicker(currentNewsText);
+	        NewsFetcher.Article article = NewsFetcher.fetchNews(query);
+	        if (article != null) {
+	            currentNewsText = article.getTitle() + " " + article.getSummary();
+	            startNewsTicker(currentNewsText);
+	        } else {
+	            currentNewsText = NO_ARTICLE;
+	            startNewsTicker(currentNewsText);
+	        }
         }
         
 
@@ -259,20 +272,38 @@ public class MyApp3 extends JFrame implements ActionListener {
         AdvertisementManager manager = new AdvertisementManager();
         manager.loadAdvertisementsFromDatabase(dbConnection);
 
-		if (args.length > 0) {
-			try {
-				currentTrain = Integer.parseInt(args[0]);
-			} catch (NumberFormatException e) {
-				System.err.println("Invalid arg for current train number. Using default value of 1.");
-				currentTrain = 1;
-			}
-		}
+        if (args.length > 0) {
+            try {
+                int trainNum = Integer.parseInt(args[0]);
+                if (trainNum >= 1 && trainNum <= 12) {
+                    currentTrain = trainNum - 1;
+                } else {
+                    System.err.println("Invalid train number provided. Using default value.");
+                    currentTrain = 0; // Default
+                }
+            } catch (NumberFormatException e) {
+                System.err.println("Invalid city code format. Using default value.");
+                currentTrain = 0; // Default
+            }
+        } else {
+        	currentTrain = 0; // Default
+        }
 		
 		
 		if (args.length > 1) { 
 			query = args[1];
 		} else {
 			query = "Calgary"; // Default
+		}
+		
+		if (args.length > 2) {
+			cityCode = Integer.parseInt(args[2]);
+		} else {
+			cityCode = 5913490; // Default
+		}
+		
+		if (args.length > 3) {
+			userAPI = args[3];
 		}
 		
 		advertisements = manager.getAdvertisements();
