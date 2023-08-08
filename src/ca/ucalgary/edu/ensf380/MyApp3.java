@@ -201,11 +201,12 @@ public class MyApp3 extends JFrame implements ActionListener {
 								//Update map
 								ArrayList<Integer> xCoordinates = new ArrayList<>();
 								ArrayList<Integer> yCoordinates = new ArrayList<>();
-								TrainMapCreator.createImage(xCoordinates, yCoordinates, currentTrain);
+								
 								for (TrainArray.Train train : trains) {
 									xCoordinates.add(train.getTrainXCord());
 									yCoordinates.add(train.getTrainYCord());
 								}
+								TrainMapCreator.createImage(xCoordinates, yCoordinates, currentTrain);
 								//Update stations that are being shown
 						        textLabel.setText(trains[currentTrain].getPrevStationName() +
 						        		" -->  |" + trains[currentTrain].getCurrentStationName() + "|  ---> " +
@@ -275,7 +276,7 @@ public class MyApp3 extends JFrame implements ActionListener {
             try {
                 int trainNum = Integer.parseInt(args[0]);
                 if (trainNum >= 1 && trainNum <= 12) {
-                    currentTrain = trainNum - 1;
+                    currentTrain = trainNum;
                 } else {
                     System.err.println("Invalid train number provided. Using default value.");
                     currentTrain = 0; // Default
