@@ -276,7 +276,7 @@ public class MyApp3 extends JFrame implements ActionListener {
             try {
                 int trainNum = Integer.parseInt(args[0]);
                 if (trainNum >= 1 && trainNum <= 12) {
-                    currentTrain = trainNum;
+                    currentTrain = trainNum - 1;
                 } else {
                     System.err.println("Invalid train number provided. Using default value.");
                     currentTrain = 0; // Default
