@@ -15,6 +15,8 @@ public class SubwayScreen extends JFrame {
     private JButton stopButton;
 
     public SubwayScreen(List<Advertisement> advertisements, int cityCode) {
+    	
+    	
         // Create Advertisement Display
         advertisementDisplay = new AdvertisementDisplay(advertisements);
         advertisementDisplay.setVisible(false); // Initially hidden

@@ -33,63 +33,124 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import java.io.File;
-import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Comparator;
 
-import java.util.Scanner;
-
-/**
- * @author Mahdi Ansari
- *
- */
 public class MyApp3 extends JFrame implements ActionListener {
-	private static final long serialVersionUID = 1L;
-	private JTextArea outputArea;
-	private JButton startButton;
-	private JButton stopButton;
-	private Process process;
-	private ExecutorService executor;
+    private static final long serialVersionUID = 1L;
+    private static final String NO_ARTICLE = "No articles found.";
+    private JButton startButton;
+    private JButton stopButton;
+    private Process process;
+    private ExecutorService executor;
+    
+    private String currentNewsText;
+    private static String query;
+    private static int currentTrain;
+    
+    private JPanel newsPanel;
+    
+	private AdvertisementDisplay advertisementDisplay;
+    private WeatherReportDisplay WeatherReportDisplay;
+    
+    private static List<Advertisement> advertisements;
 
-	public MyApp3() {
-		setTitle("Subway Screen 3");
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent e) {
-				stopProcess();
-				dispose();
-			}
-		});
+    public MyApp3() {
+        setTitle("Subway Screen");
+        setSize(800, 600);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setVisible(true);
+        addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                stopProcess();
+                dispose();
+            }
+        });
 
-		outputArea = new JTextArea();
-		outputArea.setEditable(false);
-		JScrollPane scrollPane = new JScrollPane(outputArea);
-		scrollPane.setPreferredSize(new Dimension(400, 300));
-		add(scrollPane, BorderLayout.CENTER);
+        JPanel buttonPanel = new JPanel();
+        startButton = new JButton("Start");
+        startButton.addActionListener(this);
+        startButton.setPreferredSize(new Dimension(200, 38));
+        buttonPanel.add(startButton);
 
-		JPanel buttonPanel = new JPanel();
-		startButton = new JButton("Start");
-		startButton.addActionListener(this);
-		startButton.setPreferredSize(new Dimension(100, 38));
-		buttonPanel.add(startButton);
+        stopButton = new JButton("Stop");
+        stopButton.addActionListener(this);
+        stopButton.setEnabled(false);
+        stopButton.setPreferredSize(new Dimension(200, 38));
+        buttonPanel.add(stopButton);
+        
+        advertisementDisplay = new AdvertisementDisplay(advertisements);
+        advertisementDisplay.setVisible(false); // Initially hidden
 
-		stopButton = new JButton("Stop");
-		stopButton.addActionListener(this);
-		stopButton.setEnabled(false);
-		stopButton.setPreferredSize(new Dimension(100, 38));
-		buttonPanel.add(stopButton);
+        // Create Weather Report GUI
+        WeatherReportDisplay = new WeatherReportDisplay(5913490);
+        WeatherReportDisplay.setVisible(false); // Initially hidden
+        
+        
 
-		add(buttonPanel, BorderLayout.SOUTH);
+        
+        add(advertisementDisplay, BorderLayout.WEST);
+        add(WeatherReportDisplay, BorderLayout.EAST);
 
-		pack();
-		setLocationRelativeTo(null);
-		setVisible(true);
+        add(buttonPanel, BorderLayout.SOUTH);
+        
+        NewsFetcher.Article article = NewsFetcher.fetchNews(query, "5-8tIA1Lcsf0C4UoBn18EL-dEpRpc8GXogoACHGpnkA");
+        if (article != null) {
+            currentNewsText = article.getTitle() + " " + article.getSummary();
+            startNewsTicker(currentNewsText);
+        } else {
+            currentNewsText = NO_ARTICLE;
+            startNewsTicker(currentNewsText);
+        }
+        
 
-		executor = Executors.newFixedThreadPool(2);
-	}
+		
+        setLocationRelativeTo(null);
+        setVisible(true);
+
+        executor = Executors.newFixedThreadPool(2);
+    }
+    /**
+     * startNewsTicker displays a news ticker on the gui based on the input string
+     * 
+     * @param newsText
+     */
+    public void startNewsTicker(String newsText) {
+    	 // Formatting
+    	
+        newsPanel = new JPanel(new BorderLayout());
+        newsPanel.setPreferredSize(new Dimension(getWidth(), 30));
+        JLabel newsLabel = new JLabel(newsText, SwingConstants.LEFT);
+        newsLabel.setFont(new Font("Arial", Font.BOLD, 18));
+        newsPanel.add(newsLabel, BorderLayout.CENTER);
+        add(newsPanel, BorderLayout.NORTH);
+        newsPanel.setVisible(false);
+
+        
+        // Only scroll text if article was found
+        if (!newsText.equals(NO_ARTICLE)) {
+            Timer timer = new Timer(100, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                	// Simulates scrolling by moving last char of string to the back repeatedly
+                    String labelText = newsLabel.getText();
+                    char firstChar = labelText.charAt(0);
+                    labelText = labelText.substring(1) + firstChar;
+                    newsLabel.setText(labelText);
+
+                    if (labelText.equals(currentNewsText)) {
+                        // Scrolling has reached the end so fetch a new article
+                        NewsFetcher.Article newArticle = NewsFetcher.fetchNews(query, "5-8tIA1Lcsf0C4UoBn18EL-dEpRpc8GXogoACHGpnkA");
+                        if (newArticle != null) {
+                            currentNewsText = newArticle.getTitle() + " " + newArticle.getSummary();
+                            newsLabel.setText(currentNewsText);
+                        }
+                    }
+                }
+            });
+            timer.start();
+        }
+    }
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -103,6 +164,8 @@ public class MyApp3 extends JFrame implements ActionListener {
 	private void startProcess() {
 		if (process == null) {
 			try {
+				startDisplay();
+				
 				ProcessBuilder builder = new ProcessBuilder("java", "-jar", "./exe/SubwaySimulator.jar", "--in",
 						"./data/subway.csv", "--out", "./out");
 				builder.redirectErrorStream(true);
@@ -110,39 +173,23 @@ public class MyApp3 extends JFrame implements ActionListener {
 
 				executor.execute(() -> {
 					try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-
 						String line;
 						int i = 0;
-						int currentTrain = 3; // 1-12
+						
 						while ((line = reader.readLine()) != null) {
-
-							if (3 == i) {
+							i++;
+							if (4 == i) {
 
 								TrainArray.Train[] trains = TrainArray.parseCsvFile();
-
-								System.out.println(trains[currentTrain].toString());
-
 								ArrayList<Integer> xCoordinates = new ArrayList<>();
 								ArrayList<Integer> yCoordinates = new ArrayList<>();
 								for (TrainArray.Train train : trains) {
 									xCoordinates.add(train.getTrainXCord());
 									yCoordinates.add(train.getTrainYCord());
 								}
-
 								TrainMapCreator.createImage(xCoordinates, yCoordinates, currentTrain);
-
-								String query = "Calgary";
-								NewsFetcher.Article article = NewsFetcher.fetchNews(query);
-								if (article != null) {
-									System.out.println(article.getTitle() + article.getSummary());
-								} else {
-									System.out.println("No articles found.");
-								}
-
 								i = 0;
 							}
-							i++;
-
 						}
 					} catch (IOException e) {
 						e.printStackTrace();
@@ -172,14 +219,52 @@ public class MyApp3 extends JFrame implements ActionListener {
 
 	private void stopProcess() {
 		if (process != null) {
+			stopDisplay();
 			process.destroy();
 			process = null;
 			stopButton.setEnabled(false);
 			startButton.setEnabled(true);
 		}
 	}
+	
+    private void startDisplay() {
+        advertisementDisplay.setVisible(true);
+        WeatherReportDisplay.setVisible(true);
+        newsPanel.setVisible(true);
+        
+    }
+
+    private void stopDisplay() {
+        advertisementDisplay.setVisible(false);
+        WeatherReportDisplay.setVisible(false);
+        newsPanel.setVisible(false);
+    }
 
 	public static void main(String[] args) {
+        DatabaseConnection dbConnection = new DatabaseConnection();
+        dbConnection.createConnection();
+        AdvertisementManager manager = new AdvertisementManager();
+        manager.loadAdvertisementsFromDatabase(dbConnection);
+
+		if (args.length > 0) {
+			try {
+				currentTrain = Integer.parseInt(args[0]);
+			} catch (NumberFormatException e) {
+				System.err.println("Invalid arg for current train number. Using default value of 1.");
+				currentTrain = 1;
+			}
+		}
+		
+		
+		if (args.length > 1) { 
+			query = args[1];
+		} else {
+			query = "Calgary"; // Default
+		}
+		
+		advertisements = manager.getAdvertisements();
 		SwingUtilities.invokeLater(MyApp3::new);
+		
+        dbConnection.close();
 	}
 }
